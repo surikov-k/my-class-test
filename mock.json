@@ -1,0 +1,21 @@
+[
+  {
+    "id": 9,
+    "date": "2019-09-01",
+    "title": "Orange",
+    "status": 1,
+    "visitCount": 3,
+    "students": [
+      {
+        "id": 1,
+        "name": "Ivan"
+      }
+    ],
+    "teachers": [
+      {
+        "id": 1,
+        "name": "Tanya"
+      }
+    ]
+  }
+]
