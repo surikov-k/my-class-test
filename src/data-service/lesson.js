@@ -1,13 +1,19 @@
 'use strict';
 
 class LessonService {
-  constructor(lessons) {
-    this._lessons = lessons;
+  constructor(db) {
+    this._db = db;
   }
 
-  findAll() {
-    return this._lessons;
+  async findAll() {
+    const query = `SELECT * FROM lessons ORDER BY id ASC`;
+    const {rows: lessons} = await this._db.query(query);
+    return lessons;
   }
+
+  // db.query(`INSERT INTO lessons (date, title, status, visit_count, students, teachers) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`, [lesson.date, lesson.title, lesson.status, lesson.visitCount, lesson.students, lesson.teachers])
+
+  // id, date, title, status
 
   create(lesson) {
     const newLesson = {
@@ -18,7 +24,7 @@ class LessonService {
       visitCount: lesson.visitCount,
       students: lesson.students,
       teachers: lesson.teachers
-    }
+    };
     this._lessons.push(newLesson);
     return newLesson;
   }

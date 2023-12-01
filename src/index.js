@@ -1,9 +1,9 @@
 'use strict';
-const {DEFAULT_PORT, HttpCode, API_PREFIX} = require("./constants");
+const {DEFAULT_PORT, HttpCode, API_PREFIX} = require(`./constants`);
 const port = process.env.PORT || DEFAULT_PORT;
-const routes = require('./api');
+const routes = require(`./api`);
 
-const express = require('express');
+const express = require(`express`);
 const app = express();
 app.use(express.json());
 

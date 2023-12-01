@@ -1,15 +1,15 @@
 'use strict';
 
-const {Router} = require('express');
+const {Router} = require(`express`);
 
-const lesson = require('./lesson');
-const mock = require('../../mock.json');
-const {LessonService} = require("../data-service");
+const lesson = require(`./lesson`);
+const {LessonService} = require(`../data-service`);
+const db = require(`../lib/db`);
 
 const app = new Router();
 
 (async () => {
-  lesson(app, new LessonService(mock));
+  lesson(app, new LessonService(db));
 })();
 
 module.exports = app;

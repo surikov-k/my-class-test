@@ -1,6 +1,6 @@
 'use strict';
 
-const LessonService = require('./lesson');
+const LessonService = require(`./lesson`);
 
 module.exports = {
   LessonService
