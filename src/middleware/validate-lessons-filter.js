@@ -41,7 +41,6 @@ module.exports = (req, res, next) => {
     return res.status(HttpCode.BAD_REQUEST).send({message: errors.join(`, `)});
   }
 
-  console.log(filter);
   res.locals.lessonFilter = filter;
 
   return next();

@@ -9,7 +9,8 @@ module.exports = (app, service) => {
   app.use(`/lesson`, route);
 
   route.get(`/`, validateLessonsFilter, async (req, res) => {
-    const lessons = await service.findAll();
+    const filter = res.locals.lessonFilter;
+    const lessons = await service.findAll(filter);
     res.status(HttpCode.OK).json(lessons);
   });
 

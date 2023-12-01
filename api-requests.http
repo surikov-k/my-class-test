@@ -1,8 +1,8 @@
 ### Get all lessons
-GET http://localhost:8000/api/lesson HTTP/1.1
+GET http://localhost:8000/api/lesson?lessonsPerPage=10 HTTP/1.1
 
 ### Get all filtered lessons
-GET http://localhost:8000/api/lesson?date=2022-11-1,2023-12-11&status=0&teachersIds=1,2&studentsCount=4,7&page=5&lessonsPerPage=15 HTTP/1.1
+GET http://localhost:8000/api/lesson?date=2019-09-01,2019-09-02&status=1&teachersIds=1,2,3&studentsCount=3&page=1&lessonsPerPage=30 HTTP/1.1
 
 ### Create a lesson
 POST http://localhost:8000/api/lesson HTTP/1.1
