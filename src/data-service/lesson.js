@@ -7,7 +7,6 @@ class LessonService {
     this._db = db;
   }
 
-
   async findAll(filter) {
     const client = await this._db.connect();
     const {page, limit} = filter;
@@ -62,6 +61,19 @@ class LessonService {
       lastDate,
     } = body;
     const datesRange = generateDateArrayByRange(firstDate, lastDate, days);
+    return await this.bulkSave(datesRange, title, teacherIds);
+  }
+
+  async createByCount(body) {
+    const {
+      teacherIds,
+      title,
+      days,
+      firstDate,
+      lessonsCount,
+    } = body;
+    const datesRange = generateDateArrayByCount(firstDate, lessonsCount, days);
+
     return await this.bulkSave(datesRange, title, teacherIds);
   }
 
@@ -179,6 +191,31 @@ function generateDateArrayByRange(firstDate, lastDate, days) {
   }
 
   return dateArray;
+}
+
+function generateDateArrayByCount(firstDate, lessonCount, days) {
+  const startDate = new Date(firstDate);
+
+  const dateArray = [];
+  let currentDate = startDate;
+  console.log(currentDate, lessonCount, days);
+
+  for (let i = 0; i < lessonCount && isDifferenceLessThanYear(startDate, currentDate); i++) {
+    if (days.includes(currentDate.getDay())) {
+      dateArray.push(currentDate.toISOString().split(`T`)[0]);
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dateArray;
+}
+
+function isDifferenceLessThanYear(date1, date2) {
+  const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
+
+  const differenceInMilliseconds = Math.abs(date2 - date1);
+
+  return differenceInMilliseconds < oneYearInMilliseconds;
 }
 
 

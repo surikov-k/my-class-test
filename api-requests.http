@@ -16,3 +16,15 @@ Content-Type: application/json
   "lastDate": "2019-09-17"
 }
 
+### Create lessons with firstDate and lessonsCount
+POST http://localhost:8000/api/lesson HTTP/1.1
+Content-Type: application/json
+
+{
+  "teacherIds": [2, 4],
+  "title": "New Red Ocean",
+  "days": [0,1,2],
+  "firstDate": "2019-09-10",
+  "lessonsCount": 10
+}
+
