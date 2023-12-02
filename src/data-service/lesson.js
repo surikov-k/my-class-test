@@ -9,6 +9,7 @@ class LessonService {
 
 
   async findAll(filter) {
+    const client = await this._db.connect();
     const {page, limit} = filter;
     const whereClause = constructWhereClause(filter);
     const havingClause = constructHavingClause(filter);
@@ -46,15 +47,13 @@ class LessonService {
                    ORDER BY lessons.id
                    OFFSET ${(page - 1) * limit} LIMIT ${limit};`;
 
-    const {rows: lessons} = await this._db.query(query);
+    const {rows: lessons} = await client.query(query);
+    client.release();
 
     return lessons;
   }
 
-
-  async createWithLastDate(body) {
-    const client = await this._db.connect();
-
+  async createByDateRange(body) {
     const {
       teacherIds,
       title,
@@ -62,55 +61,42 @@ class LessonService {
       firstDate,
       lastDate,
     } = body;
+    const datesRange = generateDateArrayByRange(firstDate, lastDate, days);
+    return await this.bulkSave(datesRange, title, teacherIds);
+  }
+
+
+  async bulkSave(datesRange, title, teacherIds) {
+    const client = await this._db.connect();
 
     try {
-      await client.query(`BEGIN ISOLATION LEVEL READ COMMITTED`); // Start a transaction
-
-      // Calculate the end date based on the constraints
-      const endDate = new Date(
-          Math.min(
-              new Date(firstDate).getTime() + 365 * 24 * 60 * 60 * 1000, // 1 year
-              new Date(lastDate).getTime()
-          )
-      );
-
-      // Generate an array of dates within the specified range and days
-      const dateArray = [];
-      let currentDate = new Date(firstDate);
-      while (currentDate <= endDate && dateArray.length < MAX_LESSON_COUNT) {
-        if (days.includes(currentDate.getDay())) {
-          dateArray.push(currentDate.toISOString().split(`T`)[0]);
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
+      await client.query(`BEGIN ISOLATION LEVEL READ COMMITTED`);
 
       const lessons = [];
 
-      for (const lessonDate of dateArray) {
+      for (const lessonDate of datesRange) {
         // Insert lesson into the lessons table
         const lessonResult = await client.query(
-            `
-              INSERT INTO lessons (date, title, status)
-              VALUES ($1, $2, 0)
-              RETURNING id, date, title, status
-          `,
-            [lessonDate, title]
+            `INSERT INTO lessons (date, title, status)
+           VALUES ($1, $2, $3)
+           RETURNING id, date, title, status`,
+            [lessonDate, title, 0]
         );
 
-        const {id: lessonId} = lessonResult.rows[0];
+        const lessonId = lessonResult.rows[0].id;
 
-        // Link teachers to the lesson
+        // Link teachers to the lesson using lessonId
         await Promise.all(
-            teacherIds.map((teacherId) =>
-              client.query(
+            teacherIds.map(async (teacherId) => {
+              await client.query(
                   `INSERT INTO lesson_teachers (lesson_id, teacher_id)
                VALUES ($1, $2)`,
                   [lessonId, teacherId]
-              )
-            )
+              );
+            })
         );
 
-        // Retrieve lesson details, including teacher names, after linking teachers
+        // Retrieve lesson details, including teacher names
         const lessonDetails = await client.query(
             `SELECT lessons.id,
                   lessons.date,
@@ -121,8 +107,7 @@ class LessonService {
            FROM lessons
                     INNER JOIN lesson_teachers ON lessons.id = lesson_teachers.lesson_id
                     INNER JOIN teachers ON lesson_teachers.teacher_id = teachers.id
-           WHERE lessons.id = $1
-          `,
+           WHERE lessons.id = $1`,
             [lessonId]
         );
 
@@ -140,19 +125,17 @@ class LessonService {
           })),
         };
 
-        // Push the lesson details to the array
         lessons.push(lesson);
       }
-
-      await client.query(`COMMIT`); // Commit the transaction
+      await client.query(`COMMIT`);
 
       return lessons;
     } catch (error) {
-      await client.query(`ROLLBACK`); // Rollback the transaction in case of an error
+      await client.query(`ROLLBACK`);
       console.error(`Error creating lessons:`, error);
       throw error;
     } finally {
-      client.release(); // Release the client back to the pool
+      client.release();
     }
   }
 
@@ -182,6 +165,22 @@ function constructHavingClause({studentsCount}) {
   }
   return having.length ? `HAVING ${having.join(` AND `)}` : ``;
 }
+
+function generateDateArrayByRange(firstDate, lastDate, days) {
+  const endDate = new Date(lastDate);
+  const dateArray = [];
+
+  let currentDate = new Date(firstDate);
+  while (currentDate <= endDate && dateArray.length < MAX_LESSON_COUNT) {
+    if (days.includes(currentDate.getDay())) {
+      dateArray.push(currentDate.toISOString().split(`T`)[0]);
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dateArray;
+}
+
 
 module.exports = LessonService;
 

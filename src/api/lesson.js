@@ -22,12 +22,11 @@ module.exports = (app, [lessonService, teacherService]) => {
     const {body} = req;
 
     if (`firstDate` in body && `lastDate` in body) {
-      lessons = await lessonService.createWithLastDate(body);
+      lessons = await lessonService.createByDateRange(body);
     } else if (
-      `firstDate` in body &&
-        `lessonsCount` in body
+      `firstDate` in body && `lessonsCount` in body
     ) {
-      lessons = await lessonService.createWithLessonsCount(body);
+      lessons = await lessonService.createByCount(body);
     }
 
     res.status(HttpCode.CREATED).json(lessons);

@@ -55,14 +55,6 @@ function isLessonsCountValid(count) {
   return typeof count === `number` && count < MAX_LESSON_COUNT;
 }
 
-function isDifferenceLessThanYear(date1, date2) {
-  const oneYearInMilliseconds = 365 * 24 * 60 * 60 * 1000;
-
-  const differenceInMilliseconds = Math.abs(date2 - date1);
-
-  return differenceInMilliseconds < oneYearInMilliseconds;
-}
-
 function validateRequestBody(body) {
   const hasFirstAndLastDate = `firstDate` in body && `lastDate` in body;
   const hasFirstDateAndLessonsCount = `firstDate` in body && `lessonsCount` in body;
