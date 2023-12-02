@@ -13,9 +13,14 @@ const HttpCode = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
+const MAX_LESSON_TITLE = 30;
+const MAX_LESSON_COUNT = 300;
+
 module.exports = {
   API_PREFIX,
   DEFAULT_PORT,
   LESSONS_PER_PAGE,
+  MAX_LESSON_TITLE,
+  MAX_LESSON_COUNT,
   HttpCode
 };

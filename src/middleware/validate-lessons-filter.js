@@ -18,6 +18,9 @@ const formator = {
 
 module.exports = (req, res, next) => {
   const {query} = req;
+  if (!query) {
+    return next();
+  }
 
   const filter = {
     limit: Number(query.lessonsPerPage) || LESSONS_PER_PAGE,
@@ -38,7 +41,7 @@ module.exports = (req, res, next) => {
   });
 
   if (errors.length > 0) {
-    return res.status(HttpCode.BAD_REQUEST).send({message: errors.join(`, `)});
+    return res.status(HttpCode.BAD_REQUEST).send({message: errors});
   }
 
   res.locals.lessonFilter = filter;
