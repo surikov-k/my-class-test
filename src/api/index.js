@@ -7,9 +7,6 @@ const {LessonService, TeacherService} = require(`../data-service`);
 const db = require(`../lib/db`);
 
 const app = new Router();
-
-(async () => {
-  lesson(app, [new LessonService(db), new TeacherService(db)]);
-})();
+lesson(app, [new LessonService(db), new TeacherService(db)]);
 
 module.exports = app;
