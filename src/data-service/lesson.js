@@ -1,6 +1,6 @@
 'use strict';
 
-const {MAX_LESSON_COUNT} = require(`../constants`);
+const {MAX_LESSON_COUNT, MAX_LESSONS_PER_PAGE} = require(`../constants`);
 
 class LessonService {
   constructor(db) {
@@ -44,7 +44,7 @@ class LessonService {
                             lessons.title
                                 ${havingClause}
                    ORDER BY lessons.id
-                   OFFSET ${(page - 1) * limit} LIMIT ${limit};`;
+                   OFFSET ${(page - 1) * limit} LIMIT ${Math.min(limit, MAX_LESSONS_PER_PAGE)};`;
 
     const {rows: lessons} = await client.query(query);
     client.release();

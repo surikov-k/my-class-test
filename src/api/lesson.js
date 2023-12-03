@@ -2,22 +2,23 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../constants`);
 const {validateLessonsFilter, validateLessonBody, validateTeachersId} = require(`../middleware`);
+const {handleAsync} = require(`../utils`);
 
 const route = new Router();
 
 module.exports = (app, [lessonService, teacherService]) => {
   app.use(`/lesson`, route);
 
-  route.get(`/`, validateLessonsFilter, async (req, res) => {
+  route.get(`/`, validateLessonsFilter, handleAsync(async (req, res) => {
     const filter = res.locals.lessonFilter;
     const lessons = await lessonService.findAll(filter);
     res.status(HttpCode.OK).json(lessons);
-  });
+  }));
 
   route.post(`/`, [
     validateTeachersId(teacherService),
     validateLessonBody,
-  ], async (req, res) => {
+  ], handleAsync(async (req, res) => {
     let lessons;
     const {body} = req;
 
@@ -30,5 +31,5 @@ module.exports = (app, [lessonService, teacherService]) => {
     }
 
     res.status(HttpCode.CREATED).json(lessons);
-  });
+  }));
 };

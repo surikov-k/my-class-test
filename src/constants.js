@@ -4,6 +4,7 @@ const DEFAULT_PORT = 8000;
 
 const API_PREFIX = `/api`;
 const LESSONS_PER_PAGE = 5;
+const MAX_LESSONS_PER_PAGE = 100;
 
 const HttpCode = {
   OK: 200,
@@ -22,5 +23,6 @@ module.exports = {
   LESSONS_PER_PAGE,
   MAX_LESSON_TITLE,
   MAX_LESSON_COUNT,
+  MAX_LESSONS_PER_PAGE,
   HttpCode
 };
