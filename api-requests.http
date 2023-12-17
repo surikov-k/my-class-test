@@ -10,10 +10,10 @@ Content-Type: application/json
 
 {
   "teacherIds": [2, 4],
-  "title": "New Red Ocean",
+  "title": "Andromache",
   "days": [0,1,2],
-  "firstDate": "2019-09-10",
-  "lastDate": "2019-09-17"
+  "firstDate": "2019-09-13",
+  "lastDate": "2019-09-24"
 }
 
 ### Create lessons with firstDate and lessonsCount
@@ -22,9 +22,9 @@ Content-Type: application/json
 
 {
   "teacherIds": [2, 4],
-  "title": "New Red Ocean",
+  "title": "impala",
   "days": [0,1,2],
-  "firstDate": "2019-09-10",
+  "firstDate": "2019-09-12",
   "lessonsCount": 10
 }
 

@@ -125,20 +125,20 @@ class LessonService {
         );
 
         // Extract relevant details from the result
-        const lesson = {
-          id: lessonDetails.rows[0].id,
-          date: lessonDetails.rows[0].date,
-          title: lessonDetails.rows[0].title,
-          status: lessonDetails.rows[0].status,
-          visitCount: 0,
-          students: [],
-          teachers: lessonDetails.rows.map((row) => ({
-            id: row.teacher_id,
-            name: row.teacher_name,
-          })),
-        };
+        // const lesson = {
+        //   id: lessonDetails.rows[0].id,
+        //   date: lessonDetails.rows[0].date,
+        //   title: lessonDetails.rows[0].title,
+        //   status: lessonDetails.rows[0].status,
+        //   visitCount: 0,
+        //   students: [],
+        //   teachers: lessonDetails.rows.map((row) => ({
+        //     id: row.teacher_id,
+        //     name: row.teacher_name,
+        //   })),
+        // };
 
-        lessons.push(lesson);
+        lessons.push(lessonDetails.rows[0].id);
       }
       await client.query(`COMMIT`);
 
