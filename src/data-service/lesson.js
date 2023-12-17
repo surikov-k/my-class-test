@@ -35,16 +35,17 @@ class LessonService {
                                   ARRAY []::JSONB[]
                               )                                                              AS teachers
                    FROM lessons
-                            FULL JOIN lesson_students ON lessons.id = lesson_students.lesson_id
-                            FULL JOIN students ON lesson_students.student_id = students.id
-                            FULL JOIN lesson_teachers ON lessons.id = lesson_teachers.lesson_id
-                            FULL JOIN teachers ON lesson_teachers.teacher_id = teachers.id
+                            LEFT JOIN lesson_students ON lessons.id = lesson_students.lesson_id
+                            LEFT JOIN students ON lesson_students.student_id = students.id
+                            LEFT JOIN lesson_teachers ON lessons.id = lesson_teachers.lesson_id
+                            LEFT JOIN teachers ON lesson_teachers.teacher_id = teachers.id
                        ${whereClause}
                    GROUP BY lessons.id, lessons.date,
                             lessons.title
                                 ${havingClause}
                    ORDER BY lessons.id
                    OFFSET ${(page - 1) * limit} LIMIT ${Math.min(limit, MAX_LESSONS_PER_PAGE)};`;
+    console.log(query);
 
     const {rows: lessons} = await client.query(query);
     client.release();
@@ -153,7 +154,7 @@ class LessonService {
 
 }
 
-function constructWhereClause({date, status, teachersIds}) {
+function constructWhereClause({date, status}) {
   const where = [];
   if (date) {
     const [dateFrom, dateTo] = date;
@@ -163,19 +164,26 @@ function constructWhereClause({date, status, teachersIds}) {
   if (status !== undefined) {
     where.push(`lessons.status = ${status}`);
   }
-  if (teachersIds) {
-    where.push(`teachers.id IN (${teachersIds.join(`, `)})`);
-  }
+
   return where.length ? `WHERE ${where.join(` AND `)}` : ``;
 }
 
-function constructHavingClause({studentsCount}) {
+function constructHavingClause({studentsCount, teachersIds}) {
   const having = [];
   if (studentsCount) {
     const [studentsCountFrom, studentsCountTo] = studentsCount;
     having.push(`COUNT(DISTINCT students.id) BETWEEN ${studentsCountFrom} AND ${studentsCountTo}`);
   }
-  return having.length ? `HAVING ${having.join(` AND `)}` : ``;
+  // HAVING 4  = ANY(ARRAY_AGG(DISTINCT t.id))
+  if (teachersIds) {
+
+    const clause = [];
+    teachersIds.forEach((id) => {
+      clause.push(`${id} = ANY(ARRAY_AGG(DISTINCT teachers.id))`);
+    });
+    having.push(clause.join(` OR `));
+  }
+  return having.length ? `HAVING ${ having.join(` AND `) }` : ``;
 }
 
 function generateDateArrayByRange(firstDate, lastDate, days) {

@@ -2,7 +2,7 @@
 GET http://localhost:8000/api/lesson?lessonsPerPage=10 HTTP/1.1
 
 ### Get all filtered lessons
-GET http://localhost:8000/api/lesson?date=2019-09-01,2019-09-02&status=1&teachersIds=1,2,3&studentsCount=3&page=1&lessonsPerPage=30 HTTP/1.1
+GET http://localhost:8000/api/lesson?teachersIds=1 HTTP/1.1
 
 ### Create lessons with firstDate and lastDate
 POST http://localhost:8000/api/lesson HTTP/1.1
